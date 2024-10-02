@@ -1,0 +1,84 @@
+SESSION
+
+*index.php*
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <form action="handleForm.php" method="POST">
+        <p><input type="text" placeholder="Username" name="firstName"></p>
+        <p><input type="password" placeholder="Password" name="password"></p>
+        <p><input type="submit" value="Submit" name="submitBtn"></p>
+    </form>
+    <button type="button" onclick="window.location.href='unset.php'">Logout</button>
+
+    <?php session_start(); ?>
+
+    <h2>
+        <?php
+        // Display any error messages
+        if (isset($_SESSION['error'])) {
+            echo "<span style='color: black;'>" . $_SESSION['error'] . "</span><br>";
+            unset($_SESSION['error']); // Clear the error message after displaying
+        } else {
+
+			// Display the currently logged-in user's information
+			if (isset($_SESSION['firstName'])) {
+				echo "User logged in: " . $_SESSION['firstName'] . "<br>";
+				echo "User password: " . $_SESSION['password'] . "<br>";
+			} 
+		}
+        ?>
+    </h2>
+
+</body>
+</html>
+
+
+*handleForm.php*
+
+<?php 
+session_start();
+
+// Check if submitBtn exists
+if (isset($_POST['submitBtn'])) {
+    // If another user is already logged in
+    if (isset($_SESSION['firstName'])) {
+        // Set an error message in session and redirect back to index.php
+        $_SESSION['error'] = "" . $_SESSION['firstName'] . " is already logged in. Wait for him to log out first.";
+        header('Location: index.php'); // Redirect to index.php
+        exit(); // Stop further execution
+    }
+
+    // Get the first name from index.php
+    $firstName = $_POST['firstName'];
+
+    // Get the password from the input field
+    $password = md5($_POST['password']); // Make sure to use secure hashing in production
+
+    // Set the session variables
+    $_SESSION['firstName'] = $firstName;
+    $_SESSION['password'] = $password;
+
+    // Go back to index.php
+    header('Location: index.php');
+    exit();
+}
+?>
+
+
+
+*unset.php*
+
+<?php  
+session_start(); // Establish connection to the current session
+session_unset(); // Delete all session variables
+session_destroy();
+header('Location: index.php'); // Go back to homepage
+?>
