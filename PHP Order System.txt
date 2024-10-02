@@ -1,0 +1,98 @@
+ORDER SYSTEM
+
+*index.php*
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    
+    table, th, td {
+        border: 1px solid black;
+        font-size: 1em;
+    }
+</style>
+<body>
+    <h1>Menu</h1>
+    <table style="width: 300px; height: 1o0px;">
+        <tr> 
+            <th>Order</th>
+            <th>Amount</th>
+        </tr>
+        <tr>
+            <td>Burger</td>
+            <td>50</td>
+        </tr>
+        <tr>
+            <td>Fries</td>
+            <td>75</td>
+        </tr>
+        <tr>
+            <td>Steak</td>
+            <td>150</td>
+        </tr>
+    </table> <br>
+
+    <form action="calculate.php">
+        <label for="orders">Select an order:</label>
+        <select name="orders" id="orders">
+            <option value="burger">Burger</option>
+            <option value="fries">Fries</option>
+            <option value="steak">Steak</option>
+        </select> <br><br>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity"><br><br>
+        <label for="cash">Cash:</label>
+        <input type="number" id="cash" name="cash"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+
+
+
+*calculate.php*
+
+<?php
+// Define prices for each order
+$prices = [
+    'burger' => 50,
+    'fries' => 75,
+    'steak' => 150
+];
+
+// Get the selected order, quantity, and cash input from the form
+$order = $_GET['orders'];
+$quantity = (int)$_GET['quantity'];
+$cash = (int)$_GET['cash'];
+
+// Calculate the total amount
+if (isset($prices[$order])) {
+    $total = $prices[$order] * $quantity;
+} else {
+    echo "Invalid order selected!";
+    exit();
+}
+
+// Check if the user has enough cash
+if ($cash >= $total) {
+    $change = $cash - $total;
+    echo "<center>RECEIPT</center> <br>";
+    echo "Order: " . ucfirst($order) . "<br>";
+    echo "Quantity: $quantity<br>";
+    echo "Total Price: $total<br>";
+    echo "You Paid: $cash<br>";
+    echo "Change: $change<br>";
+    date_default_timezone_set('Asia/Manila');
+    $currentTimestamp = time();
+    $formattedDate = date("Y-m-d H:i:s", $currentTimestamp);
+    echo $formattedDate; 
+} else {
+    $needed = $total - $cash;
+    echo "Sorry, balance is not enough";
+}
+?>
